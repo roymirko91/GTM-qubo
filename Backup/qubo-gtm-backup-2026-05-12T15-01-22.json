@@ -1,0 +1,167 @@
+{
+  "data": {
+    "t:jun-s1-1": false,
+    "t:jun-s1-2": false,
+    "m:mat1": false,
+    "m:mat2": false,
+    "te:jun-s1-1": "Setup herramientas: Apollo.io  + LinkedIn Sales Navigator + HubSpot CRM (free)",
+    "m:mat8": false,
+    "tst:jun-s1-2": "",
+    "tck:p1-4:0": false,
+    "k:2026-W20:demos": "5",
+    "t:p1-3": false
+  },
+  "exportedAt": "2026-05-12T15:01:22.038Z",
+  "sessions": [
+    {
+      "ts": "2026-05-12T15:00:06.232Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false,
+        "te:jun-s1-1": "Setup herramientas: Apollo.io  + LinkedIn Sales Navigator + HubSpot CRM (free)",
+        "m:mat8": false,
+        "tst:jun-s1-2": "",
+        "tck:p1-4:0": false,
+        "k:2026-W20:demos": "5",
+        "t:p1-3": false
+      }
+    },
+    {
+      "ts": "2026-05-12T14:58:36.592Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false,
+        "te:jun-s1-1": "Setup herramientas: Apollo.io  + LinkedIn Sales Navigator + HubSpot CRM (free)",
+        "m:mat8": false,
+        "tst:jun-s1-2": "",
+        "tck:p1-4:0": false,
+        "k:2026-W20:demos": "5",
+        "t:p1-3": false
+      }
+    },
+    {
+      "ts": "2026-05-12T14:53:36.591Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false,
+        "te:jun-s1-1": "Setup herramientas: Apollo.io  + LinkedIn Sales Navigator + HubSpot CRM (free)",
+        "m:mat8": false,
+        "tst:jun-s1-2": "",
+        "tck:p1-4:0": false,
+        "k:2026-W20:demos": "5",
+        "t:p1-3": false
+      }
+    },
+    {
+      "ts": "2026-05-12T14:48:36.589Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false,
+        "te:jun-s1-1": "Setup herramientas: Apollo.io  + LinkedIn Sales Navigator + HubSpot CRM (free)",
+        "m:mat8": false,
+        "tst:jun-s1-2": "",
+        "tck:p1-4:0": false,
+        "k:2026-W20:demos": "5",
+        "t:p1-3": false
+      }
+    },
+    {
+      "ts": "2026-05-12T14:44:14.735Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false,
+        "te:jun-s1-1": "Setup herramientas: Apollo.io  + LinkedIn Sales Navigator + HubSpot CRM (free)",
+        "m:mat8": false,
+        "tst:jun-s1-2": "",
+        "tck:p1-4:0": false,
+        "k:2026-W20:demos": "5",
+        "t:p1-3": false
+      }
+    },
+    {
+      "ts": "2026-05-12T14:39:14.684Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false,
+        "te:jun-s1-1": "Setup herramientas: Apollo.io  + LinkedIn Sales Navigator + HubSpot CRM (free)",
+        "m:mat8": false,
+        "tst:jun-s1-2": "",
+        "tck:p1-4:0": false,
+        "k:2026-W20:demos": "5",
+        "t:p1-3": false
+      }
+    },
+    {
+      "ts": "2026-05-12T14:34:14.722Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false,
+        "te:jun-s1-1": "Setup herramientas: Apollo.io  + LinkedIn Sales Navigator + HubSpot CRM (free)",
+        "m:mat8": false,
+        "tst:jun-s1-2": "",
+        "tck:p1-4:0": false,
+        "k:2026-W20:demos": "5",
+        "t:p1-3": false
+      }
+    },
+    {
+      "ts": "2026-05-12T14:29:14.837Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false,
+        "te:jun-s1-1": "Setup herramientas: Apollo.io  + LinkedIn Sales Navigator + HubSpot CRM (free)",
+        "m:mat8": false,
+        "tst:jun-s1-2": "",
+        "tck:p1-4:0": false,
+        "k:2026-W20:demos": "5",
+        "t:p1-3": false
+      }
+    },
+    {
+      "ts": "2026-05-12T14:24:14.762Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false,
+        "te:jun-s1-1": "Setup herramientas: Apollo.io  + LinkedIn Sales Navigator + HubSpot CRM (free)",
+        "m:mat8": false,
+        "tst:jun-s1-2": "",
+        "tck:p1-4:0": false,
+        "k:2026-W20:demos": "5",
+        "t:p1-3": false
+      }
+    },
+    {
+      "ts": "2026-05-12T14:19:14.690Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false,
+        "te:jun-s1-1": "Setup herramientas: Apollo.io  + LinkedIn Sales Navigator + HubSpot CRM (free)",
+        "m:mat8": false,
+        "tst:jun-s1-2": "",
+        "tck:p1-4:0": false,
+        "k:2026-W20:demos": "5",
+        "t:p1-3": false
+      }
+    }
+  ]
+}

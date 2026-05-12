@@ -1,0 +1,101 @@
+{
+  "data": {
+    "t:jun-s1-1": false,
+    "t:jun-s1-2": false,
+    "m:mat1": false,
+    "m:mat2": false
+  },
+  "exportedAt": "2026-05-11T20:26:01.875Z",
+  "sessions": [
+    {
+      "ts": "2026-05-11T20:24:42.525Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false
+      }
+    },
+    {
+      "ts": "2026-05-11T20:17:31.680Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false
+      }
+    },
+    {
+      "ts": "2026-05-11T20:12:31.557Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false
+      }
+    },
+    {
+      "ts": "2026-05-11T20:07:31.555Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false
+      }
+    },
+    {
+      "ts": "2026-05-11T20:02:31.554Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false
+      }
+    },
+    {
+      "ts": "2026-05-11T19:57:31.554Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false
+      }
+    },
+    {
+      "ts": "2026-05-11T19:52:31.553Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false
+      }
+    },
+    {
+      "ts": "2026-05-11T19:47:31.552Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false
+      }
+    },
+    {
+      "ts": "2026-05-11T19:42:31.550Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false
+      }
+    },
+    {
+      "ts": "2026-05-11T19:40:40.998Z",
+      "state": {
+        "t:jun-s1-1": false,
+        "t:jun-s1-2": false,
+        "m:mat1": false,
+        "m:mat2": false
+      }
+    }
+  ]
+}
