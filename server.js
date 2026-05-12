@@ -42,9 +42,9 @@ function loadUsers() {
   }
   // Usuarios por defecto (solo para desarrollo local)
   return [
-    { username: 'roy',    password: '1234', name: 'Roy',    role: 'admin' },
-    { username: 'ehitga', password: '456',  name: 'Ehitga', role: 'user'  },
-    { username: 'santi',  password: '987',  name: 'Santi',  role: 'user'  }
+    { username: 'roy.mirko@it4w.net', password: '1234', name: 'Roy',    role: 'super_admin' },
+    { username: 'ehitga',             password: '456',  name: 'Ehitga', role: 'editor'      },
+    { username: 'santi',              password: '987',  name: 'Santi',  role: 'editor'      }
   ];
 }
 
@@ -123,8 +123,8 @@ app.post('/api/activity', requireAuth, (req, res) => {
 
 // GET /api/logs  — solo admin
 app.get('/api/logs', requireAuth, (req, res) => {
-  if (req.session.role !== 'admin') {
-    return res.status(403).json({ error: 'Acceso denegado. Solo administradores.' });
+  if (req.session.role !== 'super_admin') {
+    return res.status(403).json({ error: 'Acceso denegado. Solo super administradores.' });
   }
   // Devolver más recientes primero
   res.json([...activityLog].reverse());

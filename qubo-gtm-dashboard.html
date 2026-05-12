@@ -481,15 +481,15 @@
 <!-- ═══════════════ NAV ═══════════════ -->
 <nav class="nav">
   <div class="nav-inner">
-    <div class="tab active" onclick="goTab('resumen')">Resumen</div>
-    <div class="tab" onclick="goTab('plan')">Plan GTM</div>
-    <div class="tab" onclick="goTab('materiales')">Materiales</div>
-    <div class="tab" onclick="goTab('kpis')">KPIs Semanales</div>
-    <div class="tab" onclick="goTab('pipeline')">Pipeline Math</div>
-    <div class="tab" onclick="goTab('blueprint')">Service Blueprint</div>
-    <div class="tab" onclick="goTab('contactos')">Contactos</div>
-    <div class="tab" onclick="goTab('aprendizajes')">Aprendizajes</div>
-    <div class="tab tab-estrategia" onclick="goTab('estrategia')">☰ Estrategia GTM</div>
+    <div class="tab active" data-tab="resumen" onclick="goTab('resumen')">Resumen</div>
+    <div class="tab" data-tab="plan" onclick="goTab('plan')">Plan GTM</div>
+    <div class="tab" data-tab="materiales" onclick="goTab('materiales')">Materiales</div>
+    <div class="tab" data-tab="kpis" onclick="goTab('kpis')">KPIs Semanales</div>
+    <div class="tab" data-tab="pipeline" onclick="goTab('pipeline')">Pipeline Math</div>
+    <div class="tab" data-tab="blueprint" onclick="goTab('blueprint')">Service Blueprint</div>
+    <div class="tab" data-tab="contactos" onclick="goTab('contactos')">Contactos</div>
+    <div class="tab" data-tab="aprendizajes" onclick="goTab('aprendizajes')">Aprendizajes</div>
+    <div class="tab tab-estrategia" data-tab="estrategia" onclick="goTab('estrategia')">☰ Estrategia GTM</div>
   </div>
 </nav>
 
@@ -3178,19 +3178,40 @@ async function doLogin() {
   }
 }
 
+// Tabs que cada rol puede ver
+const ROLE_TABS = {
+  super_admin: ['resumen','plan','materiales','kpis','pipeline','blueprint','contactos','aprendizajes','estrategia'],
+  editor:      ['resumen','plan','materiales','blueprint','estrategia']
+};
+
+function applyRoleRestrictions(role) {
+  const allowed = ROLE_TABS[role] || ROLE_TABS['editor'];
+  document.querySelectorAll('.nav-inner [data-tab]').forEach(el => {
+    const tab = el.getAttribute('data-tab');
+    if (!allowed.includes(tab)) {
+      el.style.display = 'none';
+    }
+  });
+  // Si el tab activo actual no está permitido, ir al primero permitido
+  const activeTab = document.querySelector('.nav-inner [data-tab].active');
+  if (activeTab && !allowed.includes(activeTab.getAttribute('data-tab'))) {
+    goTab(allowed[0]);
+  }
+}
+
 function showApp(user) {
   document.getElementById('loginOverlay').style.display = 'none';
   document.getElementById('userBadge').style.display     = 'flex';
   document.getElementById('logoutBtn').style.display     = 'inline-block';
   document.getElementById('userBadgeName').textContent   = user.name || user.username;
-  if (user.role === 'admin') {
+  if (user.role === 'super_admin') {
     document.getElementById('adminLogsBtn').style.display = 'inline-flex';
   }
   // Cargar estado desde servidor (fuente de verdad) antes de renderizar
   loadFromServer().then(() => {
     init();
+    applyRoleRestrictions(user.role);
     logActivity('open_dashboard', 'Dashboard iniciado');
-    // Primer sync para registrar el estado actual
     scheduleSyncToServer();
   });
 }
