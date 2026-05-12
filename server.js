@@ -16,19 +16,77 @@ function getPool() {
       connectionString: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false }
     });
-    // Crear tabla si no existe
     pool.query(`
       CREATE TABLE IF NOT EXISTS dashboard_data (
         id      INTEGER PRIMARY KEY DEFAULT 1,
         data    JSONB NOT NULL DEFAULT '{}',
         updated_at TIMESTAMPTZ DEFAULT NOW(),
         CONSTRAINT single_row CHECK (id = 1)
-      )
+      );
+      CREATE TABLE IF NOT EXISTS user_passwords (
+        username     TEXT PRIMARY KEY,
+        password_hash TEXT NOT NULL,
+        salt         TEXT NOT NULL,
+        must_change  BOOLEAN DEFAULT TRUE,
+        updated_at   TIMESTAMPTZ DEFAULT NOW()
+      );
     `).then(() => {
       console.log('DB lista');
     }).catch(e => console.error('DB init error:', e.message));
   }
   return pool;
+}
+
+// ─── Helpers de password ──────────────────────────────────────────────────────
+function hashPassword(password, salt) {
+  return crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
+}
+function makeHash(password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  return { salt, hash: hashPassword(password, salt) };
+}
+function verifyHash(password, salt, hash) {
+  return hashPassword(password, salt) === hash;
+}
+
+// Verificar contraseña contra DB primero, luego contra config.
+// Devuelve { user, must_change } o null si credenciales incorrectas.
+async function verifyLogin(username, password) {
+  const users = loadUsers();
+  const cfgUser = users.find(u =>
+    u.username.toLowerCase().trim() === username.toLowerCase().trim()
+  );
+  if (!cfgUser) return null;
+
+  const p = getPool();
+  if (p) {
+    try {
+      const r = await p.query('SELECT * FROM user_passwords WHERE username = $1', [cfgUser.username]);
+      if (r.rows.length > 0) {
+        const row = r.rows[0];
+        if (!verifyHash(password, row.salt, row.password_hash)) return null;
+        return { user: cfgUser, must_change: row.must_change };
+      }
+    } catch (e) {
+      console.error('verifyLogin DB error:', e.message);
+    }
+  }
+  // No hay registro en DB: verificar contra contraseña de config
+  if (cfgUser.password !== password) return null;
+  // Primer login: guardar hash en DB y marcar must_change=true
+  if (p) {
+    try {
+      const { salt, hash } = makeHash(password);
+      await p.query(`
+        INSERT INTO user_passwords (username, password_hash, salt, must_change)
+        VALUES ($1, $2, $3, TRUE)
+        ON CONFLICT (username) DO NOTHING
+      `, [cfgUser.username, hash, salt]);
+    } catch (e) {
+      console.error('First login hash save error:', e.message);
+    }
+  }
+  return { user: cfgUser, must_change: true };
 }
 
 // ─── Usuarios ────────────────────────────────────────────────────────────────
@@ -71,29 +129,53 @@ function requireAuth(req, res, next) {
 // ─── Rutas de API ─────────────────────────────────────────────────────────────
 
 // POST /api/login
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) {
     return res.status(400).json({ error: 'Usuario y contraseña requeridos.' });
   }
-
-  const users = loadUsers();
-  const user  = users.find(u =>
-    u.username.toLowerCase().trim() === username.toLowerCase().trim() &&
-    u.password === password
-  );
-
-  if (!user) {
+  const result = await verifyLogin(username.trim(), password);
+  if (!result) {
     addLog({ type: 'login_failed', username: username.trim(), ip: req.ip });
     return res.status(401).json({ error: 'Credenciales incorrectas.' });
   }
-
+  const { user, must_change } = result;
   const token = crypto.randomBytes(32).toString('hex');
   sessions.set(token, { username: user.username, name: user.name, role: user.role });
-
   addLog({ type: 'login', username: user.username, name: user.name, ip: req.ip });
+  res.json({ token, name: user.name, role: user.role, username: user.username, must_change });
+});
 
-  res.json({ token, name: user.name, role: user.role, username: user.username });
+// POST /api/change-password
+app.post('/api/change-password', requireAuth, async (req, res) => {
+  const { current_password, new_password } = req.body || {};
+  if (!current_password || !new_password) {
+    return res.status(400).json({ error: 'Faltan campos.' });
+  }
+  if (new_password.length < 8) {
+    return res.status(400).json({ error: 'La nueva contraseña debe tener al menos 8 caracteres.' });
+  }
+  // Verificar contraseña actual
+  const check = await verifyLogin(req.session.username, current_password);
+  if (!check) {
+    return res.status(401).json({ error: 'Contraseña actual incorrecta.' });
+  }
+  const p = getPool();
+  if (!p) return res.status(503).json({ error: 'Base de datos no disponible.' });
+  try {
+    const { salt, hash } = makeHash(new_password);
+    await p.query(`
+      INSERT INTO user_passwords (username, password_hash, salt, must_change)
+      VALUES ($1, $2, $3, FALSE)
+      ON CONFLICT (username) DO UPDATE
+        SET password_hash = $2, salt = $3, must_change = FALSE, updated_at = NOW()
+    `, [req.session.username, hash, salt]);
+    addLog({ type: 'activity', username: req.session.username, name: req.session.name, action: 'change_password', detail: '' });
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('change-password error:', e.message);
+    res.status(500).json({ error: 'Error al guardar contraseña.' });
+  }
 });
 
 // POST /api/logout

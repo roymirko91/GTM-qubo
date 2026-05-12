@@ -438,6 +438,33 @@
   </div>
 </div>
 
+<!-- ═══════════════ CHANGE PASSWORD OVERLAY ═══════════════ -->
+<div id="changePwOverlay" style="display:none;position:fixed;inset:0;background:rgba(7,11,23,.96);z-index:10000;align-items:center;justify-content:center;">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-mark" style="background:linear-gradient(135deg,#A78BFA,#4F8EF7);">🔑</div>
+      <div>
+        <div class="login-title">Cambiá tu contraseña</div>
+        <div class="login-sub" id="changePwSub">Es tu primer acceso — elegí una contraseña segura (mín. 8 caracteres)</div>
+      </div>
+    </div>
+    <div class="login-error" id="changePwError"></div>
+    <div class="login-field">
+      <label>Contraseña actual</label>
+      <input type="password" id="cpCurrent" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="login-field">
+      <label>Nueva contraseña</label>
+      <input type="password" id="cpNew" placeholder="mín. 8 caracteres" autocomplete="new-password">
+    </div>
+    <div class="login-field">
+      <label>Confirmar nueva contraseña</label>
+      <input type="password" id="cpConfirm" placeholder="repetí la nueva" autocomplete="new-password" onkeydown="if(event.key==='Enter')doChangePassword()">
+    </div>
+    <button class="login-btn" onclick="doChangePassword()">Guardar contraseña →</button>
+  </div>
+</div>
+
 <!-- ═══════════════ LOGS MODAL (solo admin) ═══════════════ -->
 <div id="logsModal">
   <div class="logs-panel">
@@ -3171,10 +3198,49 @@ async function doLogin() {
     }
     sessionStorage.setItem('gtm_token', data.token);
     sessionStorage.setItem('gtm_user',  JSON.stringify(data));
-    showApp(data);
+    if (data.must_change) {
+      // Primer login: ocultar login y mostrar cambio de contraseña obligatorio
+      document.getElementById('loginOverlay').style.display = 'none';
+      const overlay = document.getElementById('changePwOverlay');
+      overlay.style.display = 'flex';
+      overlay._onSuccess = () => showApp(data);
+    } else {
+      showApp(data);
+    }
   } catch (e) {
     errEl.textContent = 'Error de conexión con el servidor.';
     errEl.style.display = 'block';
+  }
+}
+
+async function doChangePassword() {
+  const current  = document.getElementById('cpCurrent').value;
+  const newPw    = document.getElementById('cpNew').value;
+  const confirm  = document.getElementById('cpConfirm').value;
+  const errEl    = document.getElementById('changePwError');
+  errEl.style.display = 'none';
+  if (!current || !newPw || !confirm) {
+    errEl.textContent = 'Completá todos los campos.'; errEl.style.display = 'block'; return;
+  }
+  if (newPw !== confirm) {
+    errEl.textContent = 'Las contraseñas nuevas no coinciden.'; errEl.style.display = 'block'; return;
+  }
+  if (newPw.length < 8) {
+    errEl.textContent = 'La nueva contraseña debe tener al menos 8 caracteres.'; errEl.style.display = 'block'; return;
+  }
+  try {
+    const res  = await fetch('/api/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-auth-token': getToken() },
+      body: JSON.stringify({ current_password: current, new_password: newPw })
+    });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error || 'Error.'; errEl.style.display = 'block'; return; }
+    const overlay = document.getElementById('changePwOverlay');
+    overlay.style.display = 'none';
+    if (overlay._onSuccess) overlay._onSuccess();
+  } catch (e) {
+    errEl.textContent = 'Error de conexión.'; errEl.style.display = 'block';
   }
 }
 
