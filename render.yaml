@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: qubo-gtm-dashboard
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # USERS_CONFIG: setear manualmente en el dashboard de Render como:
+      # [{"username":"roy@it4w.com","password":"TuPass","name":"Roy","role":"admin"},{"username":"ehitga@it4w.com","password":"TuPass","name":"Ehitga","role":"user"}]
