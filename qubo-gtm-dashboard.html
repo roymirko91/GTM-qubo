@@ -465,6 +465,7 @@
     </div>
     <div class="header-right">
       <button class="logs-btn" id="adminLogsBtn" onclick="loadLogs()">▤ Ver logs</button>
+      <span id="syncBadge" style="font-size:11px;font-weight:600;opacity:0;transition:opacity .5s;flex-shrink:0;"></span>
       <div class="user-badge" id="userBadge" style="display:none;">
         <span class="user-dot"></span>
         <span id="userBadgeName"></span>
@@ -1359,7 +1360,7 @@ const BK_HASH    = 'qubo-gtm-bk-hash';   // hash del último backup exportado
 const SESS_KEY   = 'qubo-gtm-sessions';  // historial de sesiones auto-guardadas
 
 function load()  { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e) { return {}; } }
-function save(s) { localStorage.setItem(KEY, JSON.stringify(s)); showToast(); checkDirty(); }
+function save(s) { localStorage.setItem(KEY, JSON.stringify(s)); showToast(); checkDirty(); scheduleSyncToServer(); }
 
 // ── Backup ──────────────────────────────────────────────────────────────
 function hashStr(s) {
@@ -1422,6 +1423,58 @@ function pushSession() {
 }
 // Auto-snapshot cada 5 minutos
 setInterval(pushSession, 5 * 60 * 1000);
+
+// ── Sincronización con servidor (persistencia real) ──────────────────────────
+let _syncTimer = null;
+let _syncIndicator = null;
+
+function scheduleSyncToServer() {
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(syncToServer, 2000); // 2 seg de debounce
+}
+
+async function syncToServer() {
+  const token = getToken ? getToken() : '';
+  if (!token) return; // no logueado todavía
+  const data = load();
+  try {
+    const res = await fetch('/api/store', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+      body: JSON.stringify(data)
+    });
+    if (res.ok) showSyncBadge('✓ Guardado en servidor', 'var(--green)');
+    else        showSyncBadge('⚠ Error al guardar', 'var(--amber)');
+  } catch (e) {
+    showSyncBadge('⚠ Sin conexión', 'var(--amber)');
+  }
+}
+
+function showSyncBadge(msg, color) {
+  const el = document.getElementById('syncBadge');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = color;
+  el.style.opacity = '1';
+  clearTimeout(el._hideTimer);
+  el._hideTimer = setTimeout(() => { el.style.opacity = '0'; }, 3000);
+}
+
+async function loadFromServer() {
+  const token = getToken ? getToken() : '';
+  if (!token) return;
+  try {
+    const res  = await fetch('/api/store', { headers: { 'x-auth-token': token } });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+      // Fusionar: el servidor es la fuente de verdad
+      localStorage.setItem(KEY, JSON.stringify(data));
+    }
+  } catch (e) {
+    console.warn('No se pudo cargar desde servidor, usando localStorage:', e.message);
+  }
+}
 function get(k)         { return load()[k]; }
 function set(k, v)      { const s = load(); s[k] = v; save(s); }
 
@@ -3136,8 +3189,13 @@ function showApp(user) {
   if (user.role === 'admin') {
     document.getElementById('adminLogsBtn').style.display = 'inline-flex';
   }
-  init();
-  logActivity('open_dashboard', 'Dashboard iniciado');
+  // Cargar estado desde servidor (fuente de verdad) antes de renderizar
+  loadFromServer().then(() => {
+    init();
+    logActivity('open_dashboard', 'Dashboard iniciado');
+    // Primer sync para registrar el estado actual
+    scheduleSyncToServer();
+  });
 }
 
 async function checkSession() {

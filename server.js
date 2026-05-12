@@ -1,10 +1,35 @@
 const express = require('express');
 const path    = require('path');
 const crypto  = require('crypto');
+const { Pool } = require('pg');
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname)));
+
+// ─── Base de datos (Render PostgreSQL) ───────────────────────────────────────
+let pool = null;
+
+function getPool() {
+  if (!pool && process.env.DATABASE_URL) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
+    });
+    // Crear tabla si no existe
+    pool.query(`
+      CREATE TABLE IF NOT EXISTS dashboard_data (
+        id      INTEGER PRIMARY KEY DEFAULT 1,
+        data    JSONB NOT NULL DEFAULT '{}',
+        updated_at TIMESTAMPTZ DEFAULT NOW(),
+        CONSTRAINT single_row CHECK (id = 1)
+      )
+    `).then(() => {
+      console.log('DB lista');
+    }).catch(e => console.error('DB init error:', e.message));
+  }
+  return pool;
+}
 
 // ─── Usuarios ────────────────────────────────────────────────────────────────
 // Para producción en Render: setear la variable de entorno USERS_CONFIG como
@@ -107,12 +132,46 @@ app.get('/api/logs', requireAuth, (req, res) => {
 
 // GET /api/health
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', sessions: sessions.size, logs: activityLog.length });
+  res.json({ status: 'ok', sessions: sessions.size, logs: activityLog.length, db: !!getPool() });
 });
 
 // GET / → sirve el dashboard
 app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, 'qubo-gtm-dashboard.html'));
+});
+
+// ─── Persistencia del estado del dashboard ────────────────────────────────────
+
+// GET /api/store → devuelve el estado completo del dashboard
+app.get('/api/store', requireAuth, async (req, res) => {
+  const p = getPool();
+  if (!p) return res.json({});
+  try {
+    const result = await p.query('SELECT data FROM dashboard_data WHERE id = 1');
+    res.json(result.rows[0]?.data || {});
+  } catch (e) {
+    console.error('Store GET error:', e.message);
+    res.json({});
+  }
+});
+
+// POST /api/store → guarda el estado completo del dashboard
+app.post('/api/store', requireAuth, async (req, res) => {
+  const p = getPool();
+  if (!p) return res.json({ ok: true, persisted: false });
+  const data = req.body || {};
+  try {
+    await p.query(`
+      INSERT INTO dashboard_data (id, data, updated_at)
+      VALUES (1, $1::jsonb, NOW())
+      ON CONFLICT (id) DO UPDATE SET data = $1::jsonb, updated_at = NOW()
+    `, [JSON.stringify(data)]);
+    addLog({ type: 'activity', username: req.session.username, name: req.session.name, action: 'autosave', detail: '' });
+    res.json({ ok: true, persisted: true });
+  } catch (e) {
+    console.error('Store POST error:', e.message);
+    res.status(500).json({ error: 'Error guardando datos: ' + e.message });
+  }
 });
 
 // ─── Arranque ─────────────────────────────────────────────────────────────────
