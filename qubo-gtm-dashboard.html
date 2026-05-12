@@ -466,17 +466,14 @@
     <div class="header-right">
       <button class="logs-btn" id="adminLogsBtn" onclick="loadLogs()">▤ Ver logs</button>
       <span id="syncBadge" style="font-size:11px;font-weight:600;opacity:0;transition:opacity .5s;flex-shrink:0;"></span>
+      <span class="prog-label">Progreso total</span>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <span class="prog-pct" id="progPct">0%</span>
       <div class="user-badge" id="userBadge" style="display:none;">
         <span class="user-dot"></span>
         <span id="userBadgeName"></span>
       </div>
       <button class="logout-btn" id="logoutBtn" style="display:none;" onclick="doLogout()">Salir</button>
-      <button class="bk-btn" onclick="exportBackup()" title="Descargar backup JSON">↓ Backup <span class="bk-badge" id="bkBadge">!</span></button>
-      <button class="bk-btn" onclick="document.getElementById('bkFile').click()" title="Restaurar desde JSON">↑ Restaurar</button>
-      <input type="file" id="bkFile" accept=".json" style="display:none" onchange="importBackup(this)">
-      <span class="prog-label">Progreso total</span>
-      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-      <span class="prog-pct" id="progPct">0%</span>
     </div>
   </div>
 </header>
