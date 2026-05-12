@@ -205,7 +205,7 @@ app.post('/api/activity', requireAuth, (req, res) => {
 
 // GET /api/logs  — solo admin
 app.get('/api/logs', requireAuth, (req, res) => {
-  if (req.session.role !== 'super_admin') {
+  if (req.session.role !== 'super_admin' && req.session.role !== 'admin') {
     return res.status(403).json({ error: 'Acceso denegado. Solo super administradores.' });
   }
   // Devolver más recientes primero

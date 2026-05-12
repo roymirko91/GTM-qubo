@@ -3247,8 +3247,11 @@ async function doChangePassword() {
 // Tabs que cada rol puede ver
 const ROLE_TABS = {
   super_admin: ['resumen','plan','materiales','kpis','pipeline','blueprint','contactos','aprendizajes','estrategia'],
+  admin:       ['resumen','plan','materiales','kpis','pipeline','blueprint','contactos','aprendizajes','estrategia'],
   editor:      ['resumen','plan','materiales','blueprint','estrategia']
 };
+
+function isAdmin(role) { return role === 'super_admin' || role === 'admin'; }
 
 function applyRoleRestrictions(role) {
   const allowed = ROLE_TABS[role] || ROLE_TABS['editor'];
@@ -3270,7 +3273,7 @@ function showApp(user) {
   document.getElementById('userBadge').style.display     = 'flex';
   document.getElementById('logoutBtn').style.display     = 'inline-block';
   document.getElementById('userBadgeName').textContent   = user.name || user.username;
-  if (user.role === 'super_admin') {
+  if (isAdmin(user.role)) {
     document.getElementById('adminLogsBtn').style.display = 'inline-flex';
   }
   // Cargar estado desde servidor (fuente de verdad) antes de renderizar
