@@ -110,6 +110,11 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', sessions: sessions.size, logs: activityLog.length });
 });
 
+// GET / → sirve el dashboard
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'qubo-gtm-dashboard.html'));
+});
+
 // ─── Arranque ─────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
