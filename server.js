@@ -42,9 +42,9 @@ function loadUsers() {
   }
   // Usuarios por defecto (solo para desarrollo local)
   return [
-    { username: 'roy.mirko@it4w.net', password: '1234', name: 'Roy',    role: 'super_admin' },
-    { username: 'ehitga',             password: '456',  name: 'Ehitga', role: 'editor'      },
-    { username: 'santi',              password: '987',  name: 'Santi',  role: 'editor'      }
+    { username: 'roy.mirko@it4w.net',     password: '1234', name: 'Roy',    role: 'super_admin' },
+    { username: 'ehitgaby.pena@it4w.net', password: '456',  name: 'Ehitga', role: 'editor'      },
+    { username: 'santiago.fain@it4w.net', password: '987',  name: 'Santi',  role: 'editor'      }
   ];
 }
 
